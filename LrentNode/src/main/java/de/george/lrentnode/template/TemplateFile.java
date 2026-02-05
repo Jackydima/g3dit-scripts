@@ -88,9 +88,7 @@ public class TemplateFile extends AbstractEntityFile<TemplateEntity> {
 	protected void writeInternal(G3FileWriterEx writer) {
 		writer.write(IDENTIFIER).writeUnsignedShort(0x3e).writeUnsignedShort(1);
 		writer.writeBool(true);
-		// TODO: Müsste man eigentlich am Ende schreiben, da erst dann die wahre Größe der
-		// Stringtable
-		// bekannt ist
+		// Placeholder for "Size Of Code Section" written in writeInternalAfterDeadbeef.
 		writer.writeInt(-1);
 
 		ImmutableList<TemplateEntity> headers = getHeaders().toList();
@@ -119,7 +117,9 @@ public class TemplateFile extends AbstractEntityFile<TemplateEntity> {
 
 	@Override
 	protected void writeInternalAfterDeadbeef(G3FileWriterEx writer, int deadbeef) {
-		writer.replaceInt(deadbeef - 35 - stringtable.getEntryCount() * 2, 31 + stringtable.getEntryCount() * 2);
+		// Write "Size Of Code Section"
+		int sizeOfCodeSectionOffset = 31 + stringtable.getEntryCount() * 2;
+		writer.replaceInt(deadbeef - sizeOfCodeSectionOffset - 4, sizeOfCodeSectionOffset);
 	}
 
 	public TemplateEntity getHeaderByPosition(int position) {
