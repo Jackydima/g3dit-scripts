@@ -16,8 +16,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
@@ -279,19 +277,19 @@ public abstract class ReflectionUtils {
 	// predicates
 	/** where member name equals given {@code name} */
 	public static <T extends Member> Predicate<T> withName(final String name) {
-		return (@Nullable T input) -> input != null && input.getName().equals(name);
+		return (T input) -> input != null && input.getName().equals(name);
 	}
 
 	/** where member name startsWith given {@code prefix} */
 	public static <T extends Member> Predicate<T> withPrefix(final String prefix) {
-		return (@Nullable T input) -> input != null && input.getName().startsWith(prefix);
+		return (T input) -> input != null && input.getName().startsWith(prefix);
 	}
 
 	/**
 	 * where member name matches given {@code regex}
 	 */
 	public static <T extends Member> Predicate<T> withNamePattern(final String regex) {
-		return (@Nullable T input) -> Pattern.matches(regex, input.getName());
+		return (T input) -> Pattern.matches(regex, input.getName());
 	}
 
 	/**
@@ -304,47 +302,47 @@ public abstract class ReflectionUtils {
 	 * </pre>
 	 */
 	public static <T extends AnnotatedElement> Predicate<T> withPattern(final String regex) {
-		return (@Nullable T input) -> Pattern.matches(regex, input.toString());
+		return (T input) -> Pattern.matches(regex, input.toString());
 	}
 
 	/** when method/constructor parameter types equals given {@code types} */
 	public static Predicate<Member> withParameters(final Class<?>... types) {
-		return (@Nullable Member input) -> Arrays.equals(parameterTypes(input), types);
+		return (Member input) -> Arrays.equals(parameterTypes(input), types);
 	}
 
 	/** when member parameter types assignable to given {@code types} */
 	public static Predicate<Member> withParametersAssignableTo(final Class<?>... types) {
-		return (@Nullable Member input) -> isAssignable(types, parameterTypes(input));
+		return (Member input) -> isAssignable(types, parameterTypes(input));
 	}
 
 	/** when method/constructor parameter types assignable from given {@code types} */
 	public static Predicate<Member> withParametersAssignableFrom(final Class<?>... types) {
-		return (@Nullable Member input) -> isAssignable(parameterTypes(input), types);
+		return (Member input) -> isAssignable(parameterTypes(input), types);
 	}
 
 	/** when method/constructor parameters count equal given {@code count} */
 	public static Predicate<Member> withParametersCount(final int count) {
-		return (@Nullable Member input) -> input != null && parameterTypes(input).length == count;
+		return (Member input) -> input != null && parameterTypes(input).length == count;
 	}
 
 	/** when field type equal given {@code type} */
 	public static <T> Predicate<Field> withType(final Class<T> type) {
-		return (@Nullable Field input) -> input != null && input.getType().equals(type);
+		return (Field input) -> input != null && input.getType().equals(type);
 	}
 
 	/** when field type assignable to given {@code type} */
 	public static <T> Predicate<Field> withTypeAssignableTo(final Class<T> type) {
-		return (@Nullable Field input) -> input != null && type.isAssignableFrom(input.getType());
+		return (Field input) -> input != null && type.isAssignableFrom(input.getType());
 	}
 
 	/** when method return type equal given {@code type} */
 	public static <T> Predicate<Method> withReturnType(final Class<T> type) {
-		return (@Nullable Method input) -> input != null && input.getReturnType().equals(type);
+		return (Method input) -> input != null && input.getReturnType().equals(type);
 	}
 
 	/** when method return type assignable from given {@code type} */
 	public static <T> Predicate<Method> withReturnTypeAssignableTo(final Class<T> type) {
-		return (@Nullable Method input) -> input != null && type.isAssignableFrom(input.getReturnType());
+		return (Method input) -> input != null && type.isAssignableFrom(input.getReturnType());
 	}
 
 	/**
@@ -357,7 +355,7 @@ public abstract class ReflectionUtils {
 	 * </pre>
 	 */
 	public static <T extends Member> Predicate<T> withModifier(final int mod) {
-		return (@Nullable T input) -> input != null && (input.getModifiers() & mod) != 0;
+		return (T input) -> input != null && (input.getModifiers() & mod) != 0;
 	}
 
 	/**
@@ -370,7 +368,7 @@ public abstract class ReflectionUtils {
 	 * </pre>
 	 */
 	public static Predicate<Class<?>> withClassModifier(final int mod) {
-		return (@Nullable Class<?> input) -> input != null && (input.getModifiers() & mod) != 0;
+		return (Class<?> input) -> input != null && (input.getModifiers() & mod) != 0;
 	}
 
 	private static Class<?>[] parameterTypes(Member member) {
