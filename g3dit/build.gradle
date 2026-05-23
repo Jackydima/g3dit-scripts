@@ -6,7 +6,7 @@ plugins {
 
 repositories {
 	maven {
-		url 'https://oss.sonatype.org/content/repositories/snapshots/'
+		url = 'https://oss.sonatype.org/content/repositories/snapshots/'
 	}
 
 	flatDir { dirs 'libs' }
@@ -116,7 +116,7 @@ task copyJar(type: Copy) {
 	dependsOn 'copyBinlib'
 	from layout.buildDirectory.file("libs/${project.name}-${project.version}-all.jar")
 	into "$projectDir/root/"
-	rename { "${project.name}.jar" }
+	rename ".*", "${project.name}.jar"
 }
 
 task dist(type: Zip) {
