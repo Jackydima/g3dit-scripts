@@ -21,6 +21,8 @@ import de.george.g3utils.util.FilesEx;
 public class ThemeManager {
 	private static final Logger logger = LoggerFactory.getLogger(ThemeManager.class);
 
+	private static boolean jgoodiesLafBroken = false;
+
 	public static ThemeInfo createThemeInfo(LookAndFeel lookAndFeel) {
 		return new ThemeInfo(lookAndFeel.getName(), lookAndFeel.getDescription(), null, false, lookAndFeel.getClass().getName(), null);
 	}
@@ -33,12 +35,18 @@ public class ThemeManager {
 			logger.warn("Failed to create system look and feel.", e);
 		}
 
-		if (SystemInfo.isWindows) {
+		if (SystemInfo.isWindows && !jgoodiesLafBroken) {
 			try {
+				// With JRE >= 25 the class com.sun.java.swing.plaf.windows.WindowsTabbedPaneUI
+				// became final, thereby breaking the jgoodies LAF.
+				Class.forName("com.jgoodies.looks.windows.WindowsTabbedPaneUI");
+
 				nativeLookAndFeel = (LookAndFeel) Class.forName("com.jgoodies.looks.windows.WindowsLookAndFeel").getConstructor()
 						.newInstance();
 			} catch (ReflectiveOperationException | LinkageError e) {
-				logger.warn("Failed to create windows look and feel.", e);
+				logger.warn("Failed to create windows look and feel: {}", e.getMessage());
+				nativeLookAndFeel = null;
+				jgoodiesLafBroken = true;
 			}
 		}
 
@@ -49,15 +57,21 @@ public class ThemeManager {
 	}
 
 	public static ThemeInfo getDefaultTheme() {
-		if (SystemInfo.isLinux)
-			return createThemeInfo(new FlatDarkLaf());
-		else
-			return getNativeTheme();
+		ThemeInfo defaultTheme = null;
+		if (!SystemInfo.isLinux)
+			defaultTheme = getNativeTheme();
+		if (defaultTheme == null)
+			defaultTheme = createThemeInfo(new FlatDarkLaf());
+		return defaultTheme;
 	}
 
 	public static boolean setTheme(ThemeInfo theme, boolean early) {
 		if (theme == null)
 			return false;
+
+		// On newer JRE versions the theme is broken...
+		if (theme.lafClassName().equals("com.jgoodies.looks.windows.WindowsLookAndFeel"))
+			theme = getDefaultTheme();
 
 		if (theme.lafClassName() != null) {
 			if (theme.lafClassName().equals(UIManager.getLookAndFeel().getClass().getName()))
