@@ -15,7 +15,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -29,18 +28,13 @@ import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.objenesis.strategy.StdInstantiatorStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
-import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
-
-import de.javakaffee.kryoserializers.guava.ImmutableSetSerializer;
 
 public class IOUtils {
 	private static final Logger logger = LoggerFactory.getLogger(IOUtils.class);
@@ -227,40 +221,20 @@ public class IOUtils {
 		}
 	}
 
-	public static Kryo getKryo() {
-		Kryo kryo = new Kryo();
-		// Beschreibung siehe: https://github.com/EsotericSoftware/kryo#object-creation
-		kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
-		kryo.addDefaultSerializer(Path.class, new Serializer<Path>() {
-			@Override
-			public void write(Kryo kryo, Output output, Path object) {
-				output.writeString(object.toString());
-			}
-
-			@Override
-			public Path read(Kryo kryo, Input input, Class<? extends Path> type) {
-				return Paths.get(input.readString());
-			}
-		});
-		ImmutableSetSerializer.registerSerializers(kryo);
-		kryo.setRegistrationRequired(false); // TODO: Use registration for safety...
-		return kryo;
-	}
-
-	public static Object loadObjectFromFile(Path inFile) throws IOException, KryoException {
+	public static Object loadObjectFromFile(Kryo kryo, Path inFile) throws IOException, KryoException {
 		try (Input output = new Input(Files.newInputStream(inFile))) {
-			return getKryo().readClassAndObject(output);
+			return kryo.readClassAndObject(output);
 		}
 
 	}
 
-	public static void saveObjectsToFile(Path outFile, Object... obj) throws IOException {
-		saveObjectToFile(obj, outFile);
+	public static void saveObjectsToFile(Kryo kryo, Path outFile, Object... obj) throws IOException {
+		saveObjectToFile(kryo, obj, outFile);
 	}
 
-	public static void saveObjectToFile(Object obj, Path outFile) throws IOException {
+	public static void saveObjectToFile(Kryo kryo, Object obj, Path outFile) throws IOException {
 		try (Output output = new Output(Files.newOutputStream(outFile))) {
-			getKryo().writeClassAndObject(output, obj);
+			kryo.writeClassAndObject(output, obj);
 		}
 	}
 

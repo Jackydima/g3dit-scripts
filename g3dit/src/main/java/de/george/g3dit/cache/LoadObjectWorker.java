@@ -5,6 +5,7 @@ import java.nio.file.Path;
 
 import javax.swing.SwingWorker;
 
+import de.george.g3dit.util.KryoInstance;
 import de.george.g3utils.util.IOUtils;
 
 public class LoadObjectWorker extends SwingWorker<Object, Void> {
@@ -17,7 +18,7 @@ public class LoadObjectWorker extends SwingWorker<Object, Void> {
 	@Override
 	protected Object doInBackground() throws Exception {
 		if (Files.exists(file)) {
-			return IOUtils.loadObjectFromFile(file);
+			return IOUtils.loadObjectFromFile(KryoInstance.get(), file);
 		}
 		return null;
 	}
