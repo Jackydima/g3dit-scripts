@@ -38,6 +38,7 @@ import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
 
 import de.javakaffee.kryoserializers.guava.ImmutableSetSerializer;
 
@@ -229,7 +230,7 @@ public class IOUtils {
 	public static Kryo getKryo() {
 		Kryo kryo = new Kryo();
 		// Beschreibung siehe: https://github.com/EsotericSoftware/kryo#object-creation
-		kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+		kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
 		kryo.addDefaultSerializer(Path.class, new Serializer<Path>() {
 			@Override
 			public void write(Kryo kryo, Output output, Path object) {
@@ -237,11 +238,12 @@ public class IOUtils {
 			}
 
 			@Override
-			public Path read(Kryo kryo, Input input, Class<Path> type) {
+			public Path read(Kryo kryo, Input input, Class<? extends Path> type) {
 				return Paths.get(input.readString());
 			}
 		});
 		ImmutableSetSerializer.registerSerializers(kryo);
+		kryo.setRegistrationRequired(false); // TODO: Use registration for safety...
 		return kryo;
 	}
 
