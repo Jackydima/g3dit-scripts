@@ -159,20 +159,15 @@ task generateJavaResources(type: MsgFmtTask) {
 	targetBundle.set("de.george.g3dit.translation.messages")
 }
 
-task generateGettextSources() {
-	group = LifecycleBasePlugin.BUILD_GROUP
+task generateGettextSources(type: Copy) {
 	description = "Updates .po, .pot, and .java files in src/main/java/de/george/g3dit/translation"
 	dependsOn(addNewMessagesToPo)
 	dependsOn(generateJavaResources)
-	doLast {
-		copy {
-			into("g3dit/src/main/java")
-			from(generateJavaResources)
-			into("de/george/g3dit/translation") {
-				from(updatePot)
-				from(addNewMessagesToPo)
-			}
-		}
+	into("g3dit/src/main/java")
+	from(generateJavaResources)
+	into("de/george/g3dit/translation") {
+		from(updatePot)
+		from(addNewMessagesToPo)
 	}
 }
 
