@@ -10,6 +10,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -204,6 +205,37 @@ public abstract class G3FileReader extends G3FileBase implements AutoCloseable {
 	}
 
 	public abstract String readEntry();
+
+	public void raiseError(Logger logger, String message, Object... params) throws G3ReadException {
+		error(logger, message, params);
+		throw new G3ReadException(message, getPos(), getFileName(), params);
+	}
+
+	public void raiseError(String message, Object... params) throws G3ReadException {
+		raiseError(logger, message, params);
+	}
+
+	public boolean expect(byte[] expected) {
+		if (buffer.remaining() < expected.length)
+			return false;
+
+		if (!Arrays.equals(readByteArray(expected.length), expected)) {
+			skip(-expected.length);
+			return false;
+		}
+
+		return true;
+	}
+
+	public void expectOrRaise(byte[] expected, Logger logger, String message, Object... params) throws G3ReadException {
+		if (!expect(expected)) {
+			raiseError(message, logger, params);
+		}
+	}
+
+	public void expectOrRaise(byte[] expected, String message, Object... params) throws G3ReadException {
+		expectOrRaise(expected, logger, message, params);
+	}
 
 	public int getSize() {
 		return buffer.capacity();
