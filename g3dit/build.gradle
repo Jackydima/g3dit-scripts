@@ -101,7 +101,15 @@ tasks.compileJava {
 }
 
 tasks.shadowJar {
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
 	mergeServiceFiles()
+	transform(com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer)
+	transform(com.github.jengelman.gradle.plugins.shadow.transformers.ApacheNoticeResourceTransformer)
+	transform(com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer) {
+		include 'META-INF/AL2.0'
+		include 'META-INF/LGPL2.1'
+	}
+  	failOnDuplicateEntries = true
 }
 
 task copyBinlib(type: Copy) {
