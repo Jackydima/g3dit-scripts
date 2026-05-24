@@ -58,7 +58,7 @@ public class FileUtil {
 	public static ArchiveFile openArchive(G3FileReaderEx reader, boolean verifyEntityGraph, boolean skipPropertySets) throws IOException {
 		reader.seek(0);
 		if (!GenomeFile.isGenomeFile(reader) || reader.getSize() < 100) {
-			throw new IOException("'" + reader.getFileName() + "' is not a valid .lrentdat/.node file.");
+			reader.raiseError(logger, "Not a valid .lrentdat/.node file.");
 		}
 
 		return Arrays.equals(reader.readSilentByteArray(14, LrentdatFile.IDENTIFIER.length), LrentdatFile.IDENTIFIER)

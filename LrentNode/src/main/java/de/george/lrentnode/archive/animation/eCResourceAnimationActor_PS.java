@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.george.g3utils.io.G3FileReader;
 import de.george.g3utils.io.G3FileReaderEx;
 import de.george.g3utils.io.G3FileWriter;
@@ -17,6 +20,8 @@ import de.george.g3utils.structure.bCVector;
 import de.george.lrentnode.archive.animation.Chunks.Chunk;
 
 public class eCResourceAnimationActor_PS extends GenomeFile {
+	private static final Logger logger = LoggerFactory.getLogger(eCResourceAnimationActor_PS.class);
+
 	public static class eSLookAtConstraintData implements G3Serializable {
 		public String nodeName;
 		public float interpolationSpeed;
@@ -89,23 +94,23 @@ public class eCResourceAnimationActor_PS extends GenomeFile {
 		@Override
 		public void read(G3FileReader reader) {
 			if (reader.readInt() != 0x616E6567) {
-				throw new IllegalArgumentException("Invalid eCWrapper_emfx2Actor.");
+				reader.raiseError(logger, "Invalid eCWrapper_emfx2Actor.");
 			}
 
 			int version = reader.readUnsignedShort();
 			if (version != 4) {
-				throw new IllegalArgumentException("Version != 4 is not supported.");
+				reader.raiseError(logger, "Version != 4 is not supported.");
 			}
 
 			int offsetEnd = reader.readInt() + reader.getPos();
 			if (!reader.readString(4).equals("FXA ")) {
-				throw new IllegalArgumentException("Invalid eCWrapper_emfx2Actor.");
+				reader.raiseError(logger, "Invalid eCWrapper_emfx2Actor.");
 			}
 			highVersion = reader.readUnsignedByte();
 			lowVersion = reader.readUnsignedByte();
 
 			if (highVersion != 1 || lowVersion != 1) {
-				throw new IllegalArgumentException("Invalid eCWrapper_emfx2Actor.");
+				reader.raiseError(logger, "Invalid eCWrapper_emfx2Actor.");
 			}
 
 			chunks = Chunks.readChunks(reader, offsetEnd);
@@ -154,7 +159,7 @@ public class eCResourceAnimationActor_PS extends GenomeFile {
 	protected void readInternal(G3FileReaderEx reader) throws IOException {
 		int version = reader.readUnsignedShort();
 		if (version != 54) {
-			throw new IllegalArgumentException("Version != 54 is not supported.");
+			reader.raiseError(logger, "Version != 54 is not supported.");
 		}
 
 		resourceSize = reader.readUnsignedInt();

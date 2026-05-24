@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.george.g3utils.io.G3FileReader;
 import de.george.g3utils.io.G3FileReaderEx;
 import de.george.g3utils.io.G3FileWriter;
@@ -14,6 +17,8 @@ import de.george.g3utils.structure.bCDateTime;
 import de.george.lrentnode.archive.animation.Chunks.Chunk;
 
 public class eCResourceAnimationMotion_PS extends GenomeFile {
+	private static final Logger logger = LoggerFactory.getLogger(eCResourceAnimationMotion_PS.class);
+
 	public static class eSFrameEffect implements G3Serializable {
 		public int keyFrame;
 		public String effectName;
@@ -43,19 +48,19 @@ public class eCResourceAnimationMotion_PS extends GenomeFile {
 		public void read(G3FileReader reader) {
 			int offsetEnd = reader.readInt() + reader.getPos();
 			if (!reader.readString(4).equals("LMA ")) {
-				throw new IllegalArgumentException("Invalid eCWrapper_emfx2Motion.");
+				reader.raiseError(logger, "Invalid eCWrapper_emfx2Motion.");
 			}
 
 			highVersion = reader.readUnsignedByte();
 			lowVersion = reader.readUnsignedByte();
 
 			if (highVersion != 1 || lowVersion != 1) {
-				throw new IllegalArgumentException("Invalid eCWrapper_emfx2Motion.");
+				reader.raiseError(logger, "Invalid eCWrapper_emfx2Motion.");
 			}
 
 			// is this an actor? (if false, it's a motion)
 			if (reader.readBool()) {
-				throw new IllegalArgumentException("Invalid eCWrapper_emfx2Motion.");
+				reader.raiseError(logger, "Invalid eCWrapper_emfx2Motion.");
 			}
 
 			chunks = Chunks.readChunks(reader, offsetEnd);

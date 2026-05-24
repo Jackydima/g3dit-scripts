@@ -3,11 +3,16 @@ package de.george.lrentnode.classes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.george.g3utils.io.G3FileReader;
 import de.george.g3utils.io.G3FileWriter;
 import de.george.g3utils.structure.bCBox;
 
 public final class eCResourceCollisionMesh_PS extends eCResourceBase_PS {
+	private static final Logger logger = LoggerFactory.getLogger(eCResourceCollisionMesh_PS.class);
+
 	private float resourcePriority;
 	private boolean convexResource;
 	private bCBox boundary;
@@ -25,7 +30,7 @@ public final class eCResourceCollisionMesh_PS extends eCResourceBase_PS {
 		resourcePriority = reader.readFloat();
 
 		if (classVersion < 0x20) {
-			throw new UnsupportedOperationException("eCResourceCollisionMesh_PS::Read(): tried to read old collision data.");
+			reader.raiseError(logger, "eCResourceCollisionMesh_PS::Read(): tried to read old collision data.");
 		}
 
 		int meshCount = reader.readInt();

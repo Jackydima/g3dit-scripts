@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ImmutableMap;
 
 import de.george.g3utils.io.G3FileReaderEx;
@@ -13,6 +16,8 @@ import de.george.g3utils.io.G3FileWriterEx;
 import de.george.g3utils.util.IndexGenerator;
 
 public abstract class ArchiveFile extends AbstractEntityFile<eCEntity> {
+	private static final Logger logger = LoggerFactory.getLogger(ArchiveFile.class);
+
 	protected static final int VERSION = 83;
 
 	public enum ArchiveType {
@@ -54,8 +59,8 @@ public abstract class ArchiveFile extends AbstractEntityFile<eCEntity> {
 		while ((parentIndex = reader.readInt()) != -1) {
 			int childIndex = reader.readInt();
 			if (childIndex < 0 || childIndex >= entities.size()) {
-				throw new IOException(reader.getFileName() + ": SubEntityDefinition contains invalid entity index " + childIndex
-						+ " at address " + (reader.getPos() - 4) + ".");
+				reader.raiseError(logger, "SubEntityDefinition contains invalid entity index {} at address {}.", childIndex,
+						reader.getPos() - 4);
 			}
 			// Attach entity
 			entities.get(parentIndex).attachChild(entities.get(childIndex));

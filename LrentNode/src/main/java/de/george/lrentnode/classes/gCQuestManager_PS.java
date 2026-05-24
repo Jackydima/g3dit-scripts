@@ -2,12 +2,17 @@ package de.george.lrentnode.classes;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.george.g3utils.io.G3FileReader;
 import de.george.g3utils.io.G3FileWriter;
 import de.george.g3utils.io.G3Serializable;
 import de.george.lrentnode.properties.bTValArray_long;
 
 public final class gCQuestManager_PS extends G3Class {
+	private static final Logger logger = LoggerFactory.getLogger(gCQuestManager_PS.class);
+
 	public static class QuestRuntimeData implements G3Serializable {
 		public static class LogEntry implements G3Serializable {
 			public String heading;
@@ -40,7 +45,7 @@ public final class gCQuestManager_PS extends G3Class {
 		public void read(G3FileReader reader) {
 			name = reader.readEntry();
 			if (reader.readUnsignedShort() != 3)
-				throw new UnsupportedOperationException("gCQuestManager_PS.Quest: Version != 3 not supported.");
+				reader.raiseError(logger, "gCQuestManager_PS.Quest: Version != 3 not supported.");
 
 			status = reader.readInt();
 			activationTimeYear = reader.readInt();

@@ -1,7 +1,6 @@
 package de.george.lrentnode.archive.lrentdat;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +35,8 @@ public class LrentdatFile extends ArchiveFile {
 
 	@Override
 	protected void readInternal(G3FileReaderEx reader) throws IOException {
-		if (!Arrays.equals(reader.readByteArray(IDENTIFIER.length), IDENTIFIER)) {
-			throw new IOException("'" + reader.getFileName() + "' is not a valid .lrentdat file.");
+		if (!reader.expect(IDENTIFIER)) {
+			reader.raiseError(logger, "Not a valid .lrentdat file.");
 		}
 
 		if (reader.readUnsignedShort() != VERSION) {
