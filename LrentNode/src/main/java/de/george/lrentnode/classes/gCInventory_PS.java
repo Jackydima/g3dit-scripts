@@ -13,6 +13,7 @@ import de.george.g3utils.util.Misc;
 import de.george.lrentnode.classes.desc.CD;
 import de.george.lrentnode.enums.G3Enums;
 import de.george.lrentnode.enums.G3Enums.gESlot;
+import de.george.lrentnode.properties.eCEntityProxy;
 import de.george.lrentnode.util.ClassUtil;
 
 public class gCInventory_PS extends G3Class {
@@ -20,6 +21,7 @@ public class gCInventory_PS extends G3Class {
 
 	private static final int SLOT_COUNT = G3Enums.maxValue(gESlot.class) + 1;
 	private static final byte[] EMPTY_SLOT = Misc.asByte("010000");
+	private static final eCEntityProxy INVALID_ENTITY_PROXY = new eCEntityProxy();
 
 	public List<G3Class> stacks;
 	public List<G3Class> slots;
@@ -59,7 +61,10 @@ public class gCInventory_PS extends G3Class {
 				reader.expectOrRaise(EMPTY_SLOT, "Expected empty slot");
 			}
 		}
-		reader.skip(15);
+
+		// Cached treasure set entities (only ever present in dumps), we ignore them.
+		for (int i = 0; i < 5; i++)
+			reader.read(eCEntityProxy.class);
 	}
 
 	@Override
@@ -89,7 +94,9 @@ public class gCInventory_PS extends G3Class {
 				writer.write(EMPTY_SLOT);
 			}
 		}
-		writer.write("010000010000010000010000010000");
+
+		for (int i = 0; i < 5; i++)
+			writer.write(INVALID_ENTITY_PROXY);
 	}
 
 	/**
