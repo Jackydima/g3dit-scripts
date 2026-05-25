@@ -18,6 +18,7 @@ import de.george.g3utils.io.G3FileWriterVirtual;
 import de.george.g3utils.io.GenomeFile;
 import de.george.g3utils.structure.GuidUtil;
 import de.george.g3utils.structure.bCBox;
+import de.george.g3utils.util.Exceptions;
 import de.george.g3utils.util.FilesEx;
 import de.george.g3utils.util.IOUtils;
 import de.george.g3utils.util.Misc;
@@ -82,7 +83,7 @@ public class FileUtil {
 	}
 
 	public static SecDat openSecdat(G3FileReaderEx reader) throws IOException {
-		return new SecDat(reader);
+		return Exceptions.wrapAsIoException(() -> new SecDat(reader));
 	}
 
 	public static TemplateFile openTemplate(String file) throws IOException {
@@ -96,7 +97,7 @@ public class FileUtil {
 	}
 
 	public static TemplateFile openTemplate(G3FileReaderEx reader) throws IOException {
-		return new TemplateFile(reader);
+		return Exceptions.wrapAsIoException(() -> new TemplateFile(reader));
 	}
 
 	public static Optional<TemplateFile> openTemplateSafe(Path file) {
@@ -285,13 +286,15 @@ public class FileUtil {
 
 	@SuppressWarnings("unchecked")
 	private static <T extends G3Class> T openOneClassGenomeFile(G3FileReaderEx reader) throws IOException {
-		if (GenomeFile.isGenomeFile(reader)) {
-			OneClassGenomeFile file = new OneClassGenomeFile(reader);
-			return file.getContainedClass();
-		} else {
-			G3FileReaderVirtual virtualReader = new G3FileReaderVirtual(reader.getBuffer());
-			return (T) ClassUtil.readSubClass(virtualReader);
-		}
+		return Exceptions.wrapAsIoException(() -> {
+			if (GenomeFile.isGenomeFile(reader)) {
+				OneClassGenomeFile file = new OneClassGenomeFile(reader);
+				return file.getContainedClass();
+			} else {
+				G3FileReaderVirtual virtualReader = new G3FileReaderVirtual(reader.getBuffer());
+				return (T) ClassUtil.readSubClass(virtualReader);
+			}
+		});
 	}
 
 	private static <T extends G3Class> T openOneClassGenomeFile(Path file) throws IOException {
@@ -305,36 +308,45 @@ public class FileUtil {
 	}
 
 	private static <T extends G3Class> void saveOneClassGenomeFile(T data, Path file) throws IOException {
-		new OneClassGenomeFile(data).save(file);
+		Exceptions.wrapAsIoException(() -> {
+			new OneClassGenomeFile(data).save(file);
+			return null;
+		});
 	}
 
 	public static eCResourceAnimationActor_PS openAnimationActor(Path file) throws IOException {
-		try (G3FileReaderEx reader = new G3FileReaderEx(file)) {
-			return new eCResourceAnimationActor_PS(reader);
-		}
+		return Exceptions.wrapAsIoException(() -> {
+			try (G3FileReaderEx reader = new G3FileReaderEx(file)) {
+				return new eCResourceAnimationActor_PS(reader);
+			}
+		});
 	}
 
 	public static eCResourceAnimationActor_PS openAnimationActor(InputStream is) throws IOException {
-		return new eCResourceAnimationActor_PS(new G3FileReaderEx(is));
+		return Exceptions.wrapAsIoException(() -> new eCResourceAnimationActor_PS(new G3FileReaderEx(is)));
 	}
 
 	public static eCResourceAnimationMotion_PS openAnimationMotion(Path file) throws IOException {
-		try (G3FileReaderEx reader = new G3FileReaderEx(file)) {
-			return new eCResourceAnimationMotion_PS(reader);
-		}
+		return Exceptions.wrapAsIoException(() -> {
+			try (G3FileReaderEx reader = new G3FileReaderEx(file)) {
+				return new eCResourceAnimationMotion_PS(reader);
+			}
+		});
 	}
 
 	public static eCResourceAnimationMotion_PS openAnimationMotion(InputStream is) throws IOException {
-		return new eCResourceAnimationMotion_PS(new G3FileReaderEx(is));
+		return Exceptions.wrapAsIoException(() -> new eCResourceAnimationMotion_PS(new G3FileReaderEx(is)));
 	}
 
 	public static gCEffectMap openEffectMap(Path file) throws IOException {
-		try (G3FileReaderEx reader = new G3FileReaderEx(file)) {
-			return new gCEffectMap(reader);
-		}
+		return Exceptions.wrapAsIoException(() -> {
+			try (G3FileReaderEx reader = new G3FileReaderEx(file)) {
+				return new gCEffectMap(reader);
+			}
+		});
 	}
 
 	public static gCEffectMap openEffectMap(InputStream is) throws IOException {
-		return new gCEffectMap(new G3FileReaderEx(is));
+		return Exceptions.wrapAsIoException(() -> new gCEffectMap(new G3FileReaderEx(is)));
 	}
 }

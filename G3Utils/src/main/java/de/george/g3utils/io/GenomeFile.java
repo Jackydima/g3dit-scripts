@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.george.g3utils.structure.Stringtable;
+import de.george.g3utils.util.Exceptions;
 import de.george.g3utils.util.Misc;
 
 public abstract class GenomeFile implements Saveable {
@@ -73,12 +74,18 @@ public abstract class GenomeFile implements Saveable {
 
 	@Override
 	public void save(Path file) throws IOException {
-		prepareSave().save(file);
+		Exceptions.wrapAsIoException(() -> {
+			prepareSave().save(file);
+			return null;
+		});
 	}
 
 	@Override
 	public void save(OutputStream out) throws IOException {
-		prepareSave().save(out);
+		Exceptions.wrapAsIoException(() -> {
+			prepareSave().save(out);
+			return null;
+		});
 	}
 
 	protected static void raiseNotGenomeFile(G3FileReaderEx reader) throws IOException {
