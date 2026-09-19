@@ -31,6 +31,12 @@ import de.george.g3dit.cache.CacheManager;
 import de.george.g3dit.gui.components.JEventList;
 import de.george.g3dit.gui.components.JTextAreaExt;
 import de.george.g3dit.gui.components.TextLineNumber;
+import de.george.g3dit.gui.components.search.ByteSearchFilterBuilder;
+import de.george.g3dit.gui.components.search.EntityGuidSearchFilterBuilder;
+import de.george.g3dit.gui.components.search.EntityNameSearchFilterBuilder;
+import de.george.g3dit.gui.components.search.EntityPositionSearchFilterBuilder;
+import de.george.g3dit.gui.components.search.ModularSearchPanel;
+import de.george.g3dit.gui.components.search.PropertySearchFilterBuilder;
 import de.george.g3dit.gui.dialogs.ExtStandardDialog;
 import de.george.g3dit.gui.renderer.BeanListCellRenderer;
 import de.george.g3dit.scripts.IScript;
@@ -41,6 +47,7 @@ import de.george.g3dit.util.ClasspathScanUtil;
 import de.george.g3dit.util.ConcurrencyUtil;
 import de.george.g3dit.util.FileManager;
 import de.george.g3dit.util.ListUtil;
+import de.george.lrentnode.archive.eCEntity;
 import net.miginfocom.swing.MigLayout;
 
 public class ScriptManager implements IScriptEnvironment {
@@ -50,6 +57,12 @@ public class ScriptManager implements IScriptEnvironment {
 	private EditorContext ctx;
 	private ScriptDialog scriptDialog;
 
+	// Jackys Addition
+	private ModularSearchPanel<eCEntity> searchPanel;
+	public ModularSearchPanel<eCEntity> getSearchPanel() {
+		return searchPanel;
+	}
+	// Jackys Addition END
 	public ScriptManager(EditorContext ctx) {
 		scripts = new TreeSet<>(Comparator.comparing(IScript::getTitle));
 		this.ctx = ctx;
@@ -152,9 +165,18 @@ public class ScriptManager implements IScriptEnvironment {
 				IScript selectedScript = selectedScripts.get(0);
 				optionPanel.addHeadline(selectedScript.getTitle());
 				btnExecute.setEnabled(true);
-
 				optionPanel.addComponent(lblDescription, "grow, gapbottom 10");
 				lblDescription.setText(selectedScript.getDescription());
+
+				// Jackys Addition
+				if (selectedScript.entitySearchEnabled())
+				{
+					searchPanel = new ModularSearchPanel(ctx, EntityNameSearchFilterBuilder.class, EntityGuidSearchFilterBuilder.class,
+						EntityPositionSearchFilterBuilder.class, PropertySearchFilterBuilder.class, ByteSearchFilterBuilder.class);
+					optionPanel.addComponent(searchPanel.getComponent(),  "split 3, width 100%, spanx");
+				}
+				// Jackys Addition END
+
 				selectedScript.installOptions(optionPanel);
 
 				optionPanel.addComponent(btnExecute, "alignx right");
@@ -203,6 +225,7 @@ public class ScriptManager implements IScriptEnvironment {
 
 			optionPanel = new OptionPanel(this);
 			optionPanel.getContent().setBorder(null);
+
 			mainPanel.add(optionPanel.getContent(), "cell 1 0");
 
 			area = new JTextAreaExt();
@@ -211,6 +234,7 @@ public class ScriptManager implements IScriptEnvironment {
 			area.getScrollPane().setRowHeaderView(tln);
 			area.setEditable(false);
 			mainPanel.add(area.getScrollPane(), "cell 1 1");
+
 
 			return mainPanel;
 		}

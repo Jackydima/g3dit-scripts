@@ -10,4 +10,8 @@ public interface IScript {
 	public boolean execute(IScriptEnvironment env);
 
 	default void installOptions(OptionPanel optionPanel) {}
+
+	default boolean entitySearchEnabled() {
+		return false;
+	}
 }

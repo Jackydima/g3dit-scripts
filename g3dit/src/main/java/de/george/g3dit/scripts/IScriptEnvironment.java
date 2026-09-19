@@ -4,8 +4,10 @@ import java.awt.Window;
 
 import de.george.g3dit.EditorContext;
 import de.george.g3dit.cache.CacheManager;
+import de.george.g3dit.gui.components.search.ModularSearchPanel;
 import de.george.g3dit.settings.Option;
 import de.george.g3dit.util.FileManager;
+import de.george.lrentnode.archive.eCEntity;
 
 public interface IScriptEnvironment {
 	public EditorContext getEditorContext();
@@ -21,4 +23,6 @@ public interface IScriptEnvironment {
 	public void log(String message, Object... arguments);
 
 	public <T> T getOption(Option<T> option);
+
+	public ModularSearchPanel<eCEntity> getSearchPanel();
 }
