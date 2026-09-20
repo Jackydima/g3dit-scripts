@@ -51,8 +51,9 @@ public class ScriptUtils {
 					continue;
 				}
 				try {
-					Files.createDirectories(saveDir);
-					archive.save(saveDir.resolve(relativePath.get()));
+					Path saveFile = saveDir.resolve(relativePath.get());
+					Files.createDirectories(saveFile.getParent());
+					archive.save(saveFile);
 				} catch (IOException e) {
 					env.log(I.trf("Failed to save {0}: {1}", file.toAbsolutePath(), e.getMessage()));
 					logger.warn("Error while saving file {}.", file.toAbsolutePath(), e);
