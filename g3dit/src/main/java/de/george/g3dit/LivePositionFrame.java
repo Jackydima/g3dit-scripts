@@ -1,5 +1,6 @@
 package de.george.g3dit;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Window;
 import java.awt.event.InputEvent;
@@ -118,6 +119,7 @@ public class LivePositionFrame extends JFrame {
 	private volatile EntityRequest.IdentifierCase searchMode;
 	private volatile boolean updateSpinners;
 
+	private JButton btnShowLog;
 	private DisplayTextDialog logDialog;
 
 	public LivePositionFrame(EditorContext ctx) {
@@ -394,7 +396,7 @@ public class LivePositionFrame extends JFrame {
 		SwingUtils.createButtonGroup(rbSpawnAtHero, rbSpawnAtCamera, rbSpawnAtCurrent);
 		btnSpawn.setComponentPopupMenu(pmSpawn);
 
-		JButton btnShowLog = new JButton(Icons.getImageIcon(Icons.Data.LOG));
+		btnShowLog = new JButton(Icons.getImageIcon(Icons.Data.LOG));
 		btnShowLog.setToolTipText(I.tr("Show log"));
 		mainPanel.add(btnShowLog, LayoutUtils.sqrBtn("wrap"));
 		btnShowLog.addActionListener(e -> showLog());
@@ -429,6 +431,8 @@ public class LivePositionFrame extends JFrame {
 	}
 
 	private void log(String message) {
+		if (!logDialog.isVisible())
+			btnShowLog.setBackground(Color.ORANGE.darker());
 		logDialog.append(message + "\n");
 	}
 
@@ -619,6 +623,7 @@ public class LivePositionFrame extends JFrame {
 	private void showLog() {
 		logDialog.setVisible(true);
 		SwingUtils.bringToFront(logDialog);
+		btnShowLog.setBackground(new JButton().getBackground());
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})

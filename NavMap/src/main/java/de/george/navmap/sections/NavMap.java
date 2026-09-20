@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,12 +113,12 @@ public class NavMap extends GenomeFile {
 
 	@Override
 	protected void readInternal(G3FileReaderEx reader) throws IOException {
-		if (!Arrays.equals(reader.readByteArray(IDENTIFIER.length), IDENTIFIER)) {
-			throw new IOException("'" + reader.getFileName() + "' is not a valid NavigationMap.");
+		if (!reader.expect(IDENTIFIER)) {
+			reader.raiseError(logger, "Not a valid NavigationMap.");
 		}
 
 		if (reader.readUnsignedInt() != 3 || reader.readUnsignedInt() > 0) {
-			throw new IOException("Unsupported NavigationMap version.");
+			reader.raiseError(logger, "Unsupported NavigationMap version.");
 		}
 
 		sec1 = reader.read(Section1.class);

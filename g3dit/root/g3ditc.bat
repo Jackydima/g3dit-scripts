@@ -13,6 +13,7 @@ start /D "%G3DIT_DIR%" /B /WAIT java ^
   --add-opens=java.desktop/com.sun.java.swing.plaf.windows=ALL-UNNAMED ^
   --add-opens=java.base/sun.nio.fs=ALL-UNNAMED ^
   --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED ^
+  --enable-native-access=ALL-UNNAMED ^
   -Dg3dit.mode=console ^
   -Dg3dit.exefile="%G3DIT_DIR%\g3ditc.bat" ^
   -Djava.library.path="%G3DIT_DIR%:%G3DIT_DIR%\libs" ^

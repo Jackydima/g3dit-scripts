@@ -1,5 +1,8 @@
 package de.george.lrentnode.classes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.george.g3utils.io.G3FileReader;
 import de.george.g3utils.io.G3FileWriter;
 import de.george.lrentnode.structures.eCColorScale;
@@ -8,6 +11,9 @@ import de.george.lrentnode.structures.eCParticleSoundArray;
 import de.george.lrentnode.structures.eCVectorScale;
 
 public class eCParticle_PS extends G3Class {
+	private static final Logger logger = LoggerFactory.getLogger(eCParticle_PS.class);
+
+
 	private eCFloatScale subdivisionScale;
 	private eCVectorScale revolutionScale;
 	private eCVectorScale velocityScale;
@@ -89,7 +95,7 @@ public class eCParticle_PS extends G3Class {
 			sounds = new eCParticleSoundArray();
 			classVersion = 2;
 		} else {
-			throw new UnsupportedOperationException("Version > 2 is not supported.");
+			reader.raiseError(logger, "Version > 2 is not supported.");
 		}
 	}
 

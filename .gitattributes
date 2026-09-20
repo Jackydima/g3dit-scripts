@@ -1,0 +1,5 @@
+# Default normalization for text files
+* text=auto eol=lf
+
+# Force CRLF for Windows specific files
+*.bat text eol=crlf

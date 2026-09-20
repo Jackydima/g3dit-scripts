@@ -170,7 +170,7 @@ public final class ConcurrencyUtil {
 						processor.accept(items.get(i));
 					}
 				} catch (Exception e) {
-					logger.warn("Execution of '{}' failed failed.", processor, e);
+					logger.warn("Execution of '{}' failed.", processor, e);
 				} finally {
 					latch.countDown();
 				}

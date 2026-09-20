@@ -6,6 +6,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.george.g3utils.io.G3FileReader;
 import de.george.g3utils.io.G3FileReaderEx;
 import de.george.g3utils.io.G3FileWriter;
@@ -14,13 +17,15 @@ import de.george.g3utils.io.G3Serializable;
 import de.george.g3utils.io.GenomeFile;
 
 public class gCSVMManager extends GenomeFile {
+	private static final Logger logger = LoggerFactory.getLogger(gCSVMManager.class);
+
 	public static class SVoice implements G3Serializable {
 		public List<String> entries;
 
 		@Override
 		public void read(G3FileReader reader) {
 			if (reader.readUnsignedShort() != 1) {
-				throw new IllegalStateException("Version != 1 of SVoice is not supported.");
+				reader.raiseError(logger, "Version != 1 of SVoice is not supported.");
 			}
 
 			entries = reader.readPrefixedList(G3FileReader::readEntry);
@@ -40,7 +45,7 @@ public class gCSVMManager extends GenomeFile {
 			@Override
 			public void read(G3FileReader reader) {
 				if (reader.readUnsignedShort() != 1) {
-					throw new IllegalStateException("Version != 1 of SBlock::Entry not supported.");
+					reader.raiseError(logger, "Version != 1 of SBlock::Entry not supported.");
 				}
 				id = reader.readEntry();
 				description = new String(reader.readByteArray(reader.readUnsignedShort()), StandardCharsets.UTF_16LE);
@@ -59,7 +64,7 @@ public class gCSVMManager extends GenomeFile {
 		@Override
 		public void read(G3FileReader reader) {
 			if (reader.readUnsignedShort() != 2) {
-				throw new IllegalStateException("Version != 1 of SBlock not supported.");
+				reader.raiseError(logger, "Version != 1 of SBlock not supported.");
 			}
 
 			entries = reader.readPrefixedList(Entry.class);
@@ -87,7 +92,7 @@ public class gCSVMManager extends GenomeFile {
 	@Override
 	protected void readInternal(G3FileReaderEx reader) throws IOException {
 		if (reader.readUnsignedShort() != 1) {
-			throw new IOException("Version != 1 of SVMManager is not supported.");
+			reader.raiseError(logger, "Version != 1 of SVMManager is not supported.");
 		}
 
 		voiceList = reader.readStringMapPrefixed(SVoice.class);

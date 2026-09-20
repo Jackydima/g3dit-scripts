@@ -172,11 +172,7 @@ public class NavCache extends AbstractCache<NavCache> {
 			Map<String, NavPath> myPaths = new ConcurrentHashMap<>();
 
 			Awaitable awaitProcess = ConcurrencyUtil.processInPartitions(file -> {
-				try {
-					processFile(FileUtil.openArchive(file, false), myZones, myPaths);
-				} catch (IOException e) {
-					// Ignore
-				}
+				FileUtil.openArchiveSafe(file, false, false).ifPresent(archive -> processFile(archive, myZones, myPaths));
 				filesDone.incrementAndGet();
 			}, files, 3);
 

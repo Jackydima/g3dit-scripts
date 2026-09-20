@@ -2,9 +2,11 @@ package de.george.lrentnode.template;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -18,6 +20,8 @@ import de.george.lrentnode.archive.EntityTreeTraverser;
 import de.george.lrentnode.archive.eCEntity;
 
 public class TemplateFile extends AbstractEntityFile<TemplateEntity> {
+	private static final Logger logger = LoggerFactory.getLogger(TemplateFile.class);
+
 	private static final byte[] IDENTIFIER = Misc.asByte("47454E4F4D455450");
 
 	public TemplateFile(G3FileReaderEx reader) throws IOException {
@@ -34,8 +38,8 @@ public class TemplateFile extends AbstractEntityFile<TemplateEntity> {
 	}
 
 	private void readInternalExt(G3FileReaderEx reader, boolean stringtableInPlace) throws IOException {
-		if (reader.getRemainingSize() < IDENTIFIER.length || !Arrays.equals(reader.readByteArray(IDENTIFIER.length), IDENTIFIER)) {
-			throw new IOException("'" + reader.getFileName() + "' is not a valid .tple file.");
+		if (!reader.expect(IDENTIFIER)) {
+			reader.raiseError(logger, "Not a valid .tple file.");
 		}
 
 		// Skip version
@@ -74,8 +78,8 @@ public class TemplateFile extends AbstractEntityFile<TemplateEntity> {
 		while ((parentIndex = reader.readInt()) != -1) {
 			int childIndex = reader.readInt();
 			if (childIndex < 0 || childIndex >= headers.size()) {
-				throw new IOException(reader.getFileName() + ": SubEntityDefinition contains invalid entity index " + childIndex
-						+ " at address " + (reader.getPos() - 4) + ".");
+				reader.raiseError(logger, "SubEntityDefinition contains invalid entity index {} at address {}.", childIndex,
+						reader.getPos() - 4);
 			}
 			// Attach entity
 			headers.get(parentIndex).attachChild(headers.get(childIndex));
@@ -88,9 +92,7 @@ public class TemplateFile extends AbstractEntityFile<TemplateEntity> {
 	protected void writeInternal(G3FileWriterEx writer) {
 		writer.write(IDENTIFIER).writeUnsignedShort(0x3e).writeUnsignedShort(1);
 		writer.writeBool(true);
-		// TODO: Müsste man eigentlich am Ende schreiben, da erst dann die wahre Größe der
-		// Stringtable
-		// bekannt ist
+		// Placeholder for "Size Of Code Section" written in writeInternalAfterDeadbeef.
 		writer.writeInt(-1);
 
 		ImmutableList<TemplateEntity> headers = getHeaders().toList();
@@ -119,7 +121,9 @@ public class TemplateFile extends AbstractEntityFile<TemplateEntity> {
 
 	@Override
 	protected void writeInternalAfterDeadbeef(G3FileWriterEx writer, int deadbeef) {
-		writer.replaceInt(deadbeef - 35 - stringtable.getEntryCount() * 2, 31 + stringtable.getEntryCount() * 2);
+		// Write "Size Of Code Section"
+		int sizeOfCodeSectionOffset = 31 + stringtable.getEntryCount() * 2;
+		writer.replaceInt(deadbeef - sizeOfCodeSectionOffset - 4, sizeOfCodeSectionOffset);
 	}
 
 	public TemplateEntity getHeaderByPosition(int position) {

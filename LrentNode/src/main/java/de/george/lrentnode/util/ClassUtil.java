@@ -82,7 +82,8 @@ public class ClassUtil {
 		// bCPropertyObjectFactory::ReadObject: part of TYPE_TO_SIZE_FILLER is discarded
 		reader.skip(TYPE_TO_VERSION_FILLER.length);
 		G3Class clazz = ClassTypes.getClassInstance(className, reader);
-		reader.skip(4); // Skip DEC0ADDE
+		if (reader.readInt() != DEADCODE)
+			reader.raiseError(logger, "DEC0ADDE of class {} incorrect", className);
 		return new G3ClassHolder(clazz, classVersion);
 	}
 
@@ -106,7 +107,8 @@ public class ClassUtil {
 		// Header
 		reader.skip(TYPE_TO_VERSION_FILLER.length);
 		G3Class clazz = ClassTypes.getClassInstance(className, reader);
-		reader.skip(4); // Skip DEC0ADDE
+		if (reader.readInt() != DEADCODE)
+			reader.raiseError(logger, "DEC0ADDE of template class {} incorrect", className);
 		return new G3ClassHolder(clazz, classVersion);
 	}
 

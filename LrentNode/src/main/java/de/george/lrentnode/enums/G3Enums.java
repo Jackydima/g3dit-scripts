@@ -2,11 +2,14 @@ package de.george.lrentnode.enums;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import de.george.g3utils.util.ReflectionUtils;
 
 public class G3Enums {
 	private static final Logger logger = LoggerFactory.getLogger(G3Enums.class);
@@ -91,6 +94,10 @@ public class G3Enums {
 
 	public static String classToEnumName(Class<?> clazz) {
 		return clazz.getSimpleName().replaceAll(".*\\$", "");
+	}
+
+	public static int maxValue(Class<? extends G3Enum> clazz) {
+		return Arrays.stream(clazz.getFields()).map(ReflectionUtils::getStaticFieldValue).map(v -> (int) v).max(Integer::compare).get();
 	}
 
 	// gCArmorSet_PS.ModAttrib1

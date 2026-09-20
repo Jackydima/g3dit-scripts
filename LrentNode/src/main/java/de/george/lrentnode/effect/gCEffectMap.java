@@ -3,11 +3,16 @@ package de.george.lrentnode.effect;
 import java.io.IOException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.george.g3utils.io.G3FileReaderEx;
 import de.george.g3utils.io.G3FileWriterEx;
 import de.george.g3utils.io.GenomeFile;
 
 public class gCEffectMap extends GenomeFile {
+	private static final Logger logger = LoggerFactory.getLogger(gCEffectMap.class);
+
 	public List<gCEffectCommandSequence> effects;
 
 	public gCEffectMap(G3FileReaderEx reader) throws IOException {
@@ -17,7 +22,7 @@ public class gCEffectMap extends GenomeFile {
 	@Override
 	protected void readInternal(G3FileReaderEx reader) throws IOException {
 		if (reader.readUnsignedShort() != 2) {
-			throw new IOException("Unsupported EffectMap version.");
+			reader.raiseError(logger, "Unsupported EffectMap version.");
 		}
 		effects = reader.readList(gCEffectCommandSequence.class);
 	}

@@ -3093,7 +3093,15 @@ msgstr "Erstellt eine Liste aller beklaubaren NPCs (dazu zählen auch Truhen) un
 msgid "File could not be saved: {0}"
 msgstr "Datei konnte nicht gespeichert werden: {0}"
 
-#: g3dit/src/main/java/de/george/g3dit/scripts/ScriptListTeachers.java:36
+#: g3dit\src\main\java\de\george\g3dit\scripts\ScriptListSpells.java:24
+msgid "List spells"
+msgstr "Spells auflisten"
+
+#: g3dit\src\main\java\de\george\g3dit\scripts\ScriptListSpells.java:29
+msgid "List all spells (that are used)"
+msgstr "Alle Spells auflisten (welche verwendet werden)"
+
+#: g3dit\src\main\java\de\george\g3dit\scripts\ScriptListTeachers.java:36
 msgid "List teachers"
 msgstr "Lehrer auflisten"
 

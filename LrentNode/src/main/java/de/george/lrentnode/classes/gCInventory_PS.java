@@ -9,11 +9,19 @@ import org.slf4j.LoggerFactory;
 
 import de.george.g3utils.io.G3FileReader;
 import de.george.g3utils.io.G3FileWriter;
+import de.george.g3utils.util.Misc;
 import de.george.lrentnode.classes.desc.CD;
+import de.george.lrentnode.enums.G3Enums;
+import de.george.lrentnode.enums.G3Enums.gESlot;
+import de.george.lrentnode.properties.eCEntityProxy;
 import de.george.lrentnode.util.ClassUtil;
 
 public class gCInventory_PS extends G3Class {
 	private static final Logger logger = LoggerFactory.getLogger(gCInventory_PS.class);
+
+	private static final int SLOT_COUNT = G3Enums.maxValue(gESlot.class) + 1;
+	private static final byte[] EMPTY_SLOT = Misc.asByte("010000");
+	private static final eCEntityProxy INVALID_ENTITY_PROXY = new eCEntityProxy();
 
 	public List<G3Class> stacks;
 	public List<G3Class> slots;
@@ -26,7 +34,6 @@ public class gCInventory_PS extends G3Class {
 
 	@Override
 	protected void readPostClassVersion(G3FileReader reader) {
-		// TODO: Improve
 		slots = new ArrayList<>();
 		errSlots = new HashMap<>();
 
@@ -37,6 +44,9 @@ public class gCInventory_PS extends G3Class {
 		// Inventory Slots
 		reader.skip(2);
 		int slotCount = reader.readInt();
+		if (slotCount != SLOT_COUNT)
+			reader.raiseError(logger, "Expected {} slots, got {} slots", SLOT_COUNT, slotCount);
+
 		for (int i = 0; i < slotCount; i++) {
 			if (reader.readSilent(2, 1).equals("01")) {
 				G3Class slot = ClassUtil.readSubClass(reader);
@@ -48,22 +58,24 @@ public class gCInventory_PS extends G3Class {
 
 				slots.add(slot);
 			} else {
-				reader.skip(3);
+				reader.expectOrRaise(EMPTY_SLOT, "Expected empty slot");
 			}
 		}
-		reader.skip(15);
+
+		// Cached treasure set entities (only ever present in dumps), we ignore them.
+		for (int i = 0; i < 5; i++)
+			reader.read(eCEntityProxy.class);
 	}
 
 	@Override
 	protected void writePostClassVersion(G3FileWriter writer) {
-		// StringBuffer buffer = new StringBuffer();
-		// Stacks
-		writer.write("0100");
+		writer.writeUnsignedShort(1);
 		writer.writeList(stacks, ClassUtil::writeSubClass);
 
 		// Slots
-		writer.write("010013000000");
-		for (int i = 0; i < 19; i++) {
+		writer.writeUnsignedShort(1);
+		writer.writeInt(SLOT_COUNT);
+		for (int i = 0; i < SLOT_COUNT; i++) {
 			boolean found = false;
 			for (G3Class slot : slots) {
 				if (errSlots.containsKey(slot)) {
@@ -79,10 +91,12 @@ public class gCInventory_PS extends G3Class {
 				}
 			}
 			if (!found) {
-				writer.write("010000");
+				writer.write(EMPTY_SLOT);
 			}
 		}
-		writer.write("010000010000010000010000010000");
+
+		for (int i = 0; i < 5; i++)
+			writer.write(INVALID_ENTITY_PROXY);
 	}
 
 	/**

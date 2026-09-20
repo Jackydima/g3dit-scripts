@@ -3,12 +3,17 @@ package de.george.lrentnode.effect;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.george.g3utils.io.G3FileReader;
 import de.george.g3utils.io.G3FileWriter;
 import de.george.g3utils.io.G3Serializable;
 import de.george.lrentnode.util.ClassUtil;
 
 public class gCEffectCommandSequence implements G3Serializable {
+	private static final Logger logger = LoggerFactory.getLogger(gCEffectCommandSequence.class);
+
 	private String name;
 	private List<gCEffectCommand> commands = new ArrayList<>();
 
@@ -25,7 +30,7 @@ public class gCEffectCommandSequence implements G3Serializable {
 	public void read(G3FileReader reader) {
 		name = reader.readEntry();
 		if (reader.readUnsignedShort() != 1) {
-			throw new IllegalStateException("Unsupported EffectCommandSequence version.");
+			reader.raiseError(logger, "Unsupported EffectCommandSequence version.");
 		}
 		commands = reader.readList(ClassUtil::readSubClass, gCEffectCommand.class);
 	}

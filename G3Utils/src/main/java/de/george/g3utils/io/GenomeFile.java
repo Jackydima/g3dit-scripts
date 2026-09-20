@@ -5,10 +5,16 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.george.g3utils.structure.Stringtable;
+import de.george.g3utils.util.Exceptions;
 import de.george.g3utils.util.Misc;
 
 public abstract class GenomeFile implements Saveable {
+	private static final Logger logger = LoggerFactory.getLogger(GenomeFile.class);
+
 	protected static final byte[] GENOME_MAGIC = Misc.asByte("47454E4F4D464C45");
 
 	protected Stringtable stringtable;
@@ -68,17 +74,23 @@ public abstract class GenomeFile implements Saveable {
 
 	@Override
 	public void save(Path file) throws IOException {
-		prepareSave().save(file);
+		Exceptions.wrapAsIoException(() -> {
+			prepareSave().save(file);
+			return null;
+		});
 	}
 
 	@Override
 	public void save(OutputStream out) throws IOException {
-		prepareSave().save(out);
+		Exceptions.wrapAsIoException(() -> {
+			prepareSave().save(out);
+			return null;
+		});
 	}
 
 	protected static void raiseNotGenomeFile(G3FileReaderEx reader) throws IOException {
 		if (!isGenomeFile(reader)) {
-			throw new IOException("'" + reader.getFileName() + "' is not a valid Genome file.");
+			reader.raiseError(logger, "Not a valid Genome file.");
 		}
 		reader.skip(8);
 	}

@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 
 import com.teamunify.i18n.I;
 
+import de.george.g3dit.util.KryoInstance;
 import de.george.g3dit.util.event.HolderEventList;
 import de.george.g3utils.util.IOUtils;
 
@@ -64,7 +65,7 @@ public abstract class AbstractCache<T extends AbstractCache<T>> implements Seria
 		for (int i = 1; i <= objects.length; i++) {
 			objectArray[i] = objects[i - 1];
 		}
-		IOUtils.saveObjectsToFile(file, objectArray);
+		IOUtils.saveObjectsToFile(KryoInstance.get(), file, objectArray);
 	}
 
 	protected void generateCreationTimestamp() {

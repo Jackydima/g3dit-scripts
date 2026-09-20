@@ -2,12 +2,17 @@ package de.george.lrentnode.classes;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.george.g3utils.io.G3FileReader;
 import de.george.g3utils.io.G3FileWriter;
 import de.george.g3utils.structure.bCBox;
 import de.george.lrentnode.structures.eCMeshElement;
 
 public final class eCResourceMeshComplex_PS extends eCResourceBase_PS {
+	private static final Logger logger = LoggerFactory.getLogger(eCResourceMeshComplex_PS.class);
+
 	private float resourcePriority;
 	public List<eCMeshElement> meshElements;
 
@@ -20,7 +25,7 @@ public final class eCResourceMeshComplex_PS extends eCResourceBase_PS {
 		super.readPostClassVersion(reader);
 
 		if (classVersion < 0x22) {
-			throw new UnsupportedOperationException("eCResourceMeshComplex_PS::Read(): Old format is not supported.");
+			reader.raiseError(logger, "eCResourceMeshComplex_PS::Read(): Old format is not supported.");
 		}
 
 		resourcePriority = reader.readFloat();
